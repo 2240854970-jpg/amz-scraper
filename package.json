@@ -1,0 +1,18 @@
+{
+  "name": "amz-scraper",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "npx playwright install chromium && npx tsx server.ts",
+    "build": "echo 'no build needed'"
+  },
+  "dependencies": {
+    "express": "^5",
+    "playwright": "^1"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^20.19.41",
+    "tsx": "^4.22.2"
+  }
+}
