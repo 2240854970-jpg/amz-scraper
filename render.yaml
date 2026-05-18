@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: amz-scraper
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: npm install && npx playwright install chromium
+    startCommand: npx tsx server.ts
+    autoDeploy: true
