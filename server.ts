@@ -20,9 +20,17 @@ app.post("/scrape", async (req, res) => {
     });
 
     const page = await browser.newPage();
+    await page.setRequestInterception(true);
+    page.on("request", (req) => {
+      if (["image", "stylesheet", "font", "media"].includes(req.resourceType())) {
+        req.abort();
+      } else {
+        req.continue();
+      }
+    });
     await page.setExtraHTTPHeaders({ "Accept-Language": "en-US,en;q=0.9" });
-    await page.goto(url, { waitUntil: "domcontentloaded", timeout: 25000 });
-    await page.waitForSelector("#productTitle", { timeout: 8000 }).catch(() => {});
+    await page.goto(url, { waitUntil: "load", timeout: 25000 });
+    await page.waitForSelector("#productTitle", { timeout: 5000 }).catch(() => {});
 
     const data = await page.evaluate(() => {
       const t = (s: string) => document.querySelector(s)?.textContent?.trim() || "";
