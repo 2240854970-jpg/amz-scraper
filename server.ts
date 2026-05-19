@@ -13,6 +13,7 @@ app.post("/scrape", async (req, res) => {
   try {
     browser = await puppeteer.launch({
       headless: true,
+      executablePath: "/opt/render/.cache/puppeteer/chrome/linux-127.0.6533.88/chrome-linux64/chrome",
       args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage", "--single-process"],
     });
 
