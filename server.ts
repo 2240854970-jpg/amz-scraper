@@ -1,6 +1,7 @@
-// Amazon scraper - Puppeteer + Express
+// Amazon scraper - @sparticuz/chromium + puppeteer-core
 import express from "express";
-import puppeteer from "puppeteer";
+import chromium from "@sparticuz/chromium";
+import puppeteer from "puppeteer-core";
 
 const app = express();
 app.use(express.json());
@@ -12,9 +13,10 @@ app.post("/scrape", async (req, res) => {
   let browser;
   try {
     browser = await puppeteer.launch({
-      headless: true,
-      executablePath: "/opt/render/.cache/puppeteer/chrome/linux-127.0.6533.88/chrome-linux64/chrome",
-      args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage", "--single-process"],
+      args: chromium.args,
+      defaultViewport: chromium.defaultViewport,
+      executablePath: await chromium.executablePath(),
+      headless: chromium.headless,
     });
 
     const page = await browser.newPage();
@@ -23,7 +25,7 @@ app.post("/scrape", async (req, res) => {
     await page.waitForSelector("#productTitle", { timeout: 8000 }).catch(() => {});
 
     const data = await page.evaluate(() => {
-      const t = (s) => document.querySelector(s)?.textContent?.trim() || "";
+      const t = (s: string) => document.querySelector(s)?.textContent?.trim() || "";
       const ratingText = t("#acrPopover") || t('[data-hook="rating-out-of-text"]');
       const rating = (ratingText.match(/(\d+\.?\d*)/) || [])[1] || "";
       const reviews = (t("#acrCustomerReviewText").match(/([\d,]+)/) || [])[1]?.replace(/,/g, "") || "";

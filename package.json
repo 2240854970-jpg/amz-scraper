@@ -8,6 +8,8 @@
   "dependencies": {
     "express": "^5",
     "puppeteer": "^22",
+    "puppeteer-core": "^22",
+    "@sparticuz/chromium": "^138",
     "playwright": "^1",
     "tsx": "^4"
   }
