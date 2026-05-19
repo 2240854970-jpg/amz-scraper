@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "start": "npx tsx server.ts",
-    "build": "echo 'no build needed'"
+    "postinstall": "npx playwright install --with-deps chromium"
   },
   "dependencies": {
     "express": "^5",
