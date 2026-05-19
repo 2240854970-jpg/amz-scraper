@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "start": "npx playwright install chromium && npx tsx server.ts",
+    "start": "npx tsx server.ts",
     "build": "echo 'no build needed'"
   },
   "dependencies": {
