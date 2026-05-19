@@ -21,7 +21,7 @@ app.post("/scrape", async (req, res) => {
 
     const page = await browser.newPage();
     await page.setExtraHTTPHeaders({ "Accept-Language": "en-US,en;q=0.9" });
-    await page.goto(url, { waitUntil: "domcontentloaded", timeout: 15000 });
+    await page.goto(url, { waitUntil: "domcontentloaded", timeout: 25000 });
     await page.waitForSelector("#productTitle", { timeout: 8000 }).catch(() => {});
 
     const data = await page.evaluate(() => {
