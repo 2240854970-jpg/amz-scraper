@@ -3,15 +3,12 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "start": "node server.mjs",
-    "build": "echo ok"
+    "start": "node server.mjs"
   },
   "dependencies": {
-    "puppeteer": "^22",
     "express": "^5",
+    "puppeteer": "^22",
+    "playwright": "^1",
     "tsx": "^4"
-  },
-  "devDependencies": {
-    "@types/node": "^20"
   }
 }
