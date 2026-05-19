@@ -1,0 +1,57 @@
+// Amazon scraper - Puppeteer + Express
+import express from "express";
+import puppeteer from "puppeteer";
+
+const app = express();
+app.use(express.json());
+
+app.post("/scrape", async (req, res) => {
+  const { url } = req.body;
+  if (!url) return res.status(400).json({ error: "missing url" });
+
+  let browser;
+  try {
+    browser = await puppeteer.launch({
+      headless: true,
+      args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage", "--single-process"],
+    });
+
+    const page = await browser.newPage();
+    await page.setExtraHTTPHeaders({ "Accept-Language": "en-US,en;q=0.9" });
+    await page.goto(url, { waitUntil: "domcontentloaded", timeout: 15000 });
+    await page.waitForSelector("#productTitle", { timeout: 8000 }).catch(() => {});
+
+    const data = await page.evaluate(() => {
+      const t = (s) => document.querySelector(s)?.textContent?.trim() || "";
+      const ratingText = t("#acrPopover") || t('[data-hook="rating-out-of-text"]');
+      const rating = (ratingText.match(/(\d+\.?\d*)/) || [])[1] || "";
+      const reviews = (t("#acrCustomerReviewText").match(/([\d,]+)/) || [])[1]?.replace(/,/g, "") || "";
+      const whole = t(".a-price-whole")?.replace(/[.,]/g, "") || "";
+      const frac = t(".a-price-fraction") || "";
+      const price = whole ? `$${whole}${frac ? "." + frac : ""}` : "";
+      let bsr = "";
+      document.querySelectorAll("tr").forEach((row) => {
+        if (row.textContent?.includes("Best Sellers Rank")) {
+          const m = row.textContent.match(/#([\d,]+)/);
+          if (m) bsr = m[1].replace(/,/g, "");
+        }
+      });
+      const bullets = Array.from(document.querySelectorAll("#feature-bullets li span"))
+        .map((s) => s.textContent?.trim()).filter(Boolean).slice(0, 5);
+      const desc = (document.querySelector("#productDescription p")?.textContent || "").substring(0, 500);
+      return { title: t("#productTitle"), rating, reviews, price, bsr, bulletPoints: bullets, description: desc };
+    });
+
+    await browser.close();
+    if (!data.title) return res.status(404).json({ error: "no title" });
+    return res.json(data);
+  } catch (e) {
+    if (browser) await browser.close().catch(() => {});
+    return res.status(500).json({ error: String(e) });
+  }
+});
+
+app.get("/", (_req, res) => res.json({ status: "ok" }));
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log("amz-scraper on " + PORT));
