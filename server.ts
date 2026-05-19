@@ -1,7 +1,6 @@
-// Amazon scraper - @sparticuz/chromium + puppeteer-core
-import express from "express";
-import chromium from "@sparticuz/chromium";
-import puppeteer from "puppeteer-core";
+const express = require("express");
+const chromium = require("@sparticuz/chromium");
+const puppeteer = require("puppeteer-core");
 
 const app = express();
 app.use(express.json());
@@ -33,7 +32,7 @@ app.post("/scrape", async (req, res) => {
     await page.waitForSelector("#productTitle", { timeout: 5000 }).catch(() => {});
 
     const data = await page.evaluate(() => {
-      const t = (s: string) => document.querySelector(s)?.textContent?.trim() || "";
+      const t = (s) => document.querySelector(s)?.textContent?.trim() || "";
       const ratingText = t("#acrPopover") || t('[data-hook="rating-out-of-text"]');
       const rating = (ratingText.match(/(\d+\.?\d*)/) || [])[1] || "";
       const reviews = (t("#acrCustomerReviewText").match(/([\d,]+)/) || [])[1]?.replace(/,/g, "") || "";
